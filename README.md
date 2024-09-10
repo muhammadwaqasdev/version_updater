@@ -86,6 +86,10 @@ Replace `YOUR_IOS_APP_ID` and `YOUR_ANDROID_APP_ID` with your respective app IDs
 -   **Permissions**: No special permissions are required to use this package.
 -   **Error Handling**: The package throws exceptions if it fails to retrieve version information. Ensure proper error handling in your app.
 
+## Contributing
+
+We welcome contributions to improve this package! Please refer to our [Contributing Guide](CONTRIBUTING.md) for more details on how to get involved.
+
 ## License
 
 This package is licensed under the MIT License. See the LICENSE file for more details.
