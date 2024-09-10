@@ -1,0 +1,26 @@
+name: version_updater
+description: A Flutter package to enforce app updates by checking the current version against the latest version from the App Store and Play Store.
+version: 0.0.1
+homepage: https://your-package-homepage.com
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.3
+  package_info_plus: ^1.0.6
+  url_launcher: ^6.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+      ios:
