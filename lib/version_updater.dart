@@ -1,11 +1,11 @@
 library version_updater;
 
 import 'dart:convert';
+import 'dart:html' as html; // For web-specific functionality
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:io' show Platform;
 
 /// VersionUpdater class to check for app updates on iOS and Android.
 class VersionUpdater {
@@ -27,22 +27,21 @@ class VersionUpdater {
     bool forceUpdate = false;
 
     // Compare versions and determine if an update is needed
-    if (Platform.isIOS) {
-      forceUpdate = _isUpdateRequired(_currentVersion, _latestIosVersion);
-    } else if (Platform.isAndroid) {
-      forceUpdate = _isUpdateRequired(_currentVersion, _latestAndroidVersion);
-    }
+    // For web, just show an update dialog since we can't check platform-specific versions
+    forceUpdate = _isUpdateRequired(_currentVersion, _latestIosVersion) ||
+        _isUpdateRequired(_currentVersion, _latestAndroidVersion);
 
     // If an update is needed, show the update dialog
     if (forceUpdate) {
-      _showUpdateDialog(context, iosAppId: iosAppId, androidAppId: androidAppId);
+      _showUpdateDialog(context,
+          iosAppId: iosAppId, androidAppId: androidAppId);
     }
   }
 
   // Function to fetch the latest version from the iOS App Store
   static Future<void> _getLatestVersionFromIOS(String iosAppId) async {
-    final response =
-        await http.get(Uri.parse('https://itunes.apple.com/lookup?id=$iosAppId'));
+    final response = await http
+        .get(Uri.parse('https://itunes.apple.com/lookup?id=$iosAppId'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['resultCount'] > 0) {
@@ -93,16 +92,20 @@ class VersionUpdater {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text("Update Required"),
-        content: const Text("A new version is available. Please update to continue."),
+        content: const Text(
+            "A new version is available. Please update to continue."),
         actions: [
           TextButton(
             onPressed: () {
-              if (Platform.isIOS) {
-                _launchURL(
-                    'https://apps.apple.com/app/id$iosAppId');
-              } else if (Platform.isAndroid) {
+              if (html.window.navigator.userAgent.contains('iPhone') ||
+                  html.window.navigator.userAgent.contains('iPad')) {
+                _launchURL('https://apps.apple.com/app/id$iosAppId');
+              } else if (html.window.navigator.userAgent.contains('Android')) {
                 _launchURL(
                     'https://play.google.com/store/apps/details?id=$androidAppId');
+              } else {
+                // Default to a general update link or handle other cases
+                _launchURL('https://example.com');
               }
             },
             child: const Text("Update"),
@@ -114,10 +117,7 @@ class VersionUpdater {
 
   // Function to launch the store link
   static Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+    final Uri uri = Uri.parse(url);
+    html.window.open(uri.toString(), '_blank');
   }
 }
